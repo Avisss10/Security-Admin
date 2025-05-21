@@ -1,0 +1,55 @@
+.cab-content {
+    padding: 0 0 20px 0;
+  }
+  
+  .cabang-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background-color: white;
+  }
+  
+  .cabang-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .cabang-table th,
+  .cabang-table td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .cabang-table th {
+    font-weight: 500;
+    color: #666;
+    background-color: #fafafa;
+  }
+  
+  .cabang-table tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .edit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #7E3AF2; /* Purple color from your Edit button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .edit-btn:hover {
+    background-color: #6929c4;
+  }
+  
+  .edit-icon {
+    margin-right: 5px;
+  }

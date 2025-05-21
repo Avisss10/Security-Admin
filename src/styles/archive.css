@@ -1,0 +1,24 @@
+.archive-page {
+  width: 100%;
+}
+
+.archive-layout {
+  display: grid;
+  grid-template-columns: 1fr; /* default mobile */
+  gap: 30px;
+}
+
+@media (min-width: 992px) {
+  .archive-layout {
+    grid-template-columns: 4fr 1.5fr; /* Archive lebih lebar, Search menyesuaikan */
+    align-items: flex-start;
+  }
+}
+
+.archive-main {
+  width: 100%;
+}
+
+.archive-sidebar {
+  width: 100%;
+}
