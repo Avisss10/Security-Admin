@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/login.css';
-
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Login = ({ onLogin }) => {
@@ -9,22 +9,34 @@ const Login = ({ onLogin }) => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Basic validation
-    if (!nip || !password) {
-      setError('NIP dan Password harus diisi');
-      return;
-    }
-    
-    // Here you would typically make an API call to authenticate
-    // For now, we'll just simulate a successful login
-    // Replace this with actual authentication logic
-    
-    onLogin(nip);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+
+  if (!nip || !password) {
+    setError('NIP dan Password harus diisi');
+    return;
+  }
+
+  try {
+    const res = await axios.post('http://localhost:5000/api/auth/login', {
+      nip,
+      password,
+    });
+
+    // Simpan user ke localStorage (atau context/global state kalau mau)
+    localStorage.setItem('user', JSON.stringify(res.data.user));
+
+    // Jalankan onLogin jika dikirim dari props
+    if (onLogin) onLogin(res.data.user);
+
+    // Redirect ke dashboard
     navigate('/dashboard');
-  };
+  } catch (err) {
+    setError('NIP atau Password salah atau server error.');
+  }
+};
+
 
   return (
     <div className="login-container">

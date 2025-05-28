@@ -1,0 +1,14 @@
+### GET semua user level Security
+GET http://localhost:5000/api/user?level=Security
+### Tambah laporan hari ini
+POST http://localhost:5000/api/laporan
+Content-Type: application/json
+
+{
+  "id_user": 4,
+  "id_cabang": 1,
+  "jenis_laporan": "Luar Gedung",
+  "judul_laporan": "Aktivitas mencurigakan",
+  "kondisi_cuaca": "Cerah",
+  "deskripsi_laporan": "Seseorang berdiri lama di dekat pintu gerbang."
+}

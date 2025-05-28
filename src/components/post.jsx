@@ -1,13 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../styles/post.css';
-import profileImage from '../img/profile.jpeg'; // Proper image import
+import profileImage from '../img/profile.jpeg';
 
-const Post = () => {
+const Post = ({
+  id,
+  nama,
+  nip,
+  cabang,
+  isi_laporan,
+  jam,
+  tanggal,
+  foto,
+  onDelete
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   const handleDelete = () => {
-    console.log('Post deleted');
+    if (onDelete) {
+      onDelete(id);
+    }
     setIsMenuOpen(false);
   };
 
@@ -15,7 +27,6 @@ const Post = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -39,12 +50,12 @@ const Post = () => {
             className="post-avatar"
           />
           <div className="post-user-info">
-            <span className='post-name'>Security</span>
-            <span className='post-username'>@Username</span>
-            <span className='post-location'>• Jakarta Utara</span>
+            <span className='post-name'>{nama}</span>
+            <span className='post-username'>• {nip}</span>
+            <span className='post-location'>• {cabang}</span>
           </div>
         </div>
-        
+
         <div className="post-menu" ref={menuRef}>
           <button className="menu-button" onClick={toggleMenu}>
             <svg viewBox="0 0 24 24" width="18" height="18">
@@ -58,19 +69,24 @@ const Post = () => {
           {isMenuOpen && (
             <div className="menu-dropdown">
               <button onClick={handleDelete}>Delete Post</button>
-              <button>Edit Post</button>
-              <button>Share Post</button>
             </div>
           )}
         </div>
       </div>
       
       <div className='post-content'>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis molestias ullam, nulla laborum blanditiis ducimus laudantium at vero. Alias officia, fuga maiores excepturi deleniti error accusantium a quae eveniet iure!</p>
+        <p>{isi_laporan}</p>
+        {foto && (
+          <div className="post-image">
+            <img src={`http://localhost:5000/uploads/${foto}`} alt="Foto Laporan" />
+          </div>
+        )}
       </div>
       
       <div className="post-footer">
-        <span className='post-time'>09.20 • 19/02/2025</span>
+        <span className='post-time'>
+          {jam} - Jam Laporan • {tanggal} - Tanggal Laporan
+        </span>
       </div>
     </div>
   );

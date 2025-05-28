@@ -1,58 +1,75 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BiPencil } from 'react-icons/bi';
 import '../styles/cabContent.css';
 import CabHeader from './CabHeader';
 import EditCabangModal from './cabEdit';
+import axios from 'axios';
 
 const CabContent = () => {
-  // Initial sample data with useState hook
-  const [cabangData, setCabangData] = useState([
-    {
-      id: 0,
-      namaCabang: 'Jakarta Utara',
-      alamatCabang: 'Jl.Panti, no 57 Jakarta Utara',
-    },
-    {
-      id: 1,
-      namaCabang: 'Jakarta Barat',
-      alamatCabang: 'Jl.Panti, no 57 Jakarta Barat',
-    },
-  ]);
-
-  // State for edit modal
+  const [cabangData, setCabangData] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [cabangToEdit, setCabangToEdit] = useState(null);
 
-  // Handle adding new cabang
-  const handleAddCabang = (newCabang) => {
-    setCabangData([...cabangData, newCabang]);
+  // Fetch semua cabang dari backend
+  const fetchCabangData = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/cabang');
+      const formatted = res.data.map(c => ({
+        id: c.id_cabang,
+        namaCabang: c.nama_cabang,
+        alamatCabang: c.alamat_cabang
+      }));
+      setCabangData(formatted);
+    } catch (err) {
+      console.error('Gagal fetch data cabang:', err);
+    }
   };
 
-  // Open edit modal and set the cabang to edit
+  useEffect(() => {
+    fetchCabangData();
+  }, []);
+
+  // Tambah cabang ke backend
+  const handleAddCabang = async (newCabang) => {
+    try {
+      await axios.post('http://localhost:5000/api/cabang', newCabang), {
+        nama_cabang: newCabang.namaCabang,
+        alamat_cabang: newCabang.alamatCabang
+      };
+      fetchCabangData();
+    } catch (err) {
+      console.error('Gagal tambah cabang:', err);
+    }
+  };
+
+  // Edit cabang
+  const handleUpdateCabang = async (updatedCabang) => {
+    try {
+      await axios.put(`http://localhost:5000/api/cabang/${updatedCabang.id}`, {
+        nama_cabang: updatedCabang.namaCabang,
+        alamat_cabang: updatedCabang.alamatCabang
+      });
+      fetchCabangData();
+      handleCloseEditModal();
+    } catch (err) {
+      console.error('Gagal update cabang:', err);
+    }
+  };
+
   const handleOpenEditModal = (cabang) => {
     setCabangToEdit(cabang);
     setIsEditModalOpen(true);
   };
 
-  // Close edit modal
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setCabangToEdit(null);
   };
 
-  // Update cabang data
-  const handleUpdateCabang = (updatedCabang) => {
-    setCabangData(
-      cabangData.map(cabang => 
-        cabang.id === updatedCabang.id ? updatedCabang : cabang
-      )
-    );
-  };
-
   return (
     <>
       <CabHeader onAddCabang={handleAddCabang} />
-      
+
       <div className="cab-content">
         <div className="cabang-table-container">
           <table className="cabang-table">
@@ -86,7 +103,6 @@ const CabContent = () => {
         </div>
       </div>
 
-      {/* Edit Cabang Modal */}
       <EditCabangModal 
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}

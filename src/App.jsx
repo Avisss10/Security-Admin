@@ -19,10 +19,11 @@ const App = () => {
     }
   }, []);
 
-  const handleLogin = (nip) => {
-    localStorage.setItem('user', JSON.stringify({ nip }));
+  const handleLogin = (user) => {
+    localStorage.setItem('user', JSON.stringify(user));
     setIsAuthenticated(true);
   };
+
 
   const handleLogout = () => {
     localStorage.removeItem('user');

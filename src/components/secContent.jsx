@@ -1,64 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BiPencil } from 'react-icons/bi';
 import '../styles/secContent.css';
 import SecHeader from './SecHeader';
 import EditSecurityModal from './secEdit';
+import axios from 'axios';
 
 const SecContent = () => {
-  // Initial sample data
-  const [securityAccounts, setSecurityAccounts] = useState([
-    {
-      id: 0,
-      nip: 435621,
-      name: 'Security 1',
-      password: '#hashpass',
-      cabang: 'Jakarta Barat',
-      level: 'Security',
-    },
-    {
-      id: 1,
-      nip: 435622,
-      name: 'Security 2',
-      password: '#hashpass',
-      cabang: 'Jakarta Utara',
-      level: 'Security',
-    },
-  ]);
-
-  // State for edit modal
+  const [securityAccounts, setSecurityAccounts] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [securityToEdit, setSecurityToEdit] = useState(null);
 
-  // Handle adding new security
-  const handleAddSecurity = (newSecurity) => {
-    setSecurityAccounts([...securityAccounts, newSecurity]);
+  // 🔄 Fetch data dari backend
+  const fetchSecurityAccounts = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/user?level=Security');
+      const formatted = res.data.map((user) => ({
+        id: user.id_user,
+        nip: user.nip,
+        name: user.nama_user,
+        password: user.password,
+        cabang: user.nama_cabang,
+        level: user.nama_level,
+        id_cabang: user.id_cabang,
+        id_level: user.id_level
+      }));
+      setSecurityAccounts(formatted);
+    } catch (err) {
+      console.error('Gagal fetch security:', err);
+    }
   };
 
-  // Open edit modal and set the security to edit
+  useEffect(() => {
+    fetchSecurityAccounts();
+  }, []);
+
+  // ✅ Tambah security (dari SecHeader)
+  const handleAddSecurity = async (newSecurity) => {
+    try {
+      await axios.post('http://localhost:5000/api/user', newSecurity);
+      fetchSecurityAccounts(); // refresh
+    } catch (err) {
+      console.error('Gagal tambah security:', err);
+    }
+  };
+
+  // ✅ Buka modal edit
   const handleOpenEditModal = (security) => {
     setSecurityToEdit(security);
     setIsEditModalOpen(true);
   };
 
-  // Close edit modal
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setSecurityToEdit(null);
   };
 
-  // Update security data
-  const handleUpdateSecurity = (updatedSecurity) => {
-    setSecurityAccounts(
-      securityAccounts.map(security => 
-        security.id === updatedSecurity.id ? updatedSecurity : security
-      )
-    );
+  // ✅ Update security (PUT)
+  const handleUpdateSecurity = async (updatedSecurity) => {
+    try {
+      await axios.put(`http://localhost:5000/api/user/${updatedSecurity.id}`, updatedSecurity);
+      fetchSecurityAccounts(); // refresh
+      handleCloseEditModal();
+    } catch (err) {
+      console.error('Gagal update security:', err);
+    }
   };
 
   return (
     <>
       <SecHeader onAddSecurity={handleAddSecurity} />
-      
+
       <div className="sec-content">
         <div className="security-table-container">
           <table className="security-table">
@@ -98,7 +109,7 @@ const SecContent = () => {
         </div>
       </div>
 
-      {/* Edit Security Modal */}
+      {/* Modal Edit */}
       <EditSecurityModal 
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}

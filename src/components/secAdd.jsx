@@ -1,41 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/secAdd.css';
+import axios from 'axios';
 
 const AddSecurityModal = ({ isOpen, onClose, onAddSecurity }) => {
   const [formData, setFormData] = useState({
     nip: '',
-    name: '',
+    nama_user: '',
     password: '',
-    cabang: '',
-    level: 'Security',
+    id_cabang: '',
+    id_level: 2
   });
+
+  const [cabangOptions, setCabangOptions] = useState([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/cabang')
+      .then(res => setCabangOptions(res.data))
+      .catch(err => console.error('Gagal fetch cabang:', err));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: value
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Generate a new ID based on timestamp
-    const newSecurity = {
-      id: Date.now(),
-      ...formData,
-    };
-    onAddSecurity(newSecurity);
-    
+    onAddSecurity(formData); // akan dikirim ke backend oleh SecContent
     // Reset form
     setFormData({
       nip: '',
-      name: '',
+      nama_user: '',
       password: '',
-      cabang: '',
-      level: 'Security',
+      id_cabang: '',
+      id_level: 2
     });
-    
     onClose();
   };
 
@@ -48,74 +50,63 @@ const AddSecurityModal = ({ isOpen, onClose, onAddSecurity }) => {
           <h2>Add New Security</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="nip">NIP:</label>
             <input
               type="number"
-              id="nip"
               name="nip"
               value={formData.nip}
               onChange={handleChange}
               required
             />
           </div>
-          
+
           <div className="form-group">
-            <label htmlFor="name">Name:</label>
+            <label htmlFor="nama_user">Nama:</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={formData.name}
+              name="nama_user"
+              value={formData.nama_user}
               onChange={handleChange}
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password:</label>
             <input
               type="password"
-              id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
             />
           </div>
-          
+
           <div className="form-group">
-            <label htmlFor="cabang">Cabang:</label>
+            <label htmlFor="id_cabang">Cabang:</label>
             <select
-              id="cabang"
-              name="cabang"
-              value={formData.cabang}
+              name="id_cabang"
+              value={formData.id_cabang}
               onChange={handleChange}
               required
             >
-              <option value="">Select Cabang</option>
-              <option value="Jakarta Barat">Jakarta Barat</option>
-              <option value="Jakarta Utara">Jakarta Utara</option>
-              <option value="Jakarta Selatan">Jakarta Selatan</option>
-              <option value="Jakarta Timur">Jakarta Timur</option>
-              <option value="Jakarta Pusat">Jakarta Pusat</option>
+              <option value="">Pilih Cabang</option>
+              {cabangOptions.map((opt) => (
+                <option key={opt.id_cabang} value={opt.id_cabang}>
+                  {opt.nama_cabang}
+                </option>
+              ))}
             </select>
           </div>
-          
+
           <div className="form-group">
-            <label htmlFor="level">Level:</label>
-            <input
-              type="text"
-              id="level"
-              name="level"
-              value={formData.level}
-              onChange={handleChange}
-              readOnly
-            />
+            <label>Level:</label>
+            <input type="text" value="Security" disabled readOnly />
           </div>
-          
+
           <div className="modal-actions">
             <button type="button" className="cancel-btn" onClick={onClose}>Cancel</button>
             <button type="submit" className="submit-btn">Add Security</button>

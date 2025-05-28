@@ -8,7 +8,6 @@ const EditCabangModal = ({ isOpen, onClose, cabangData, onUpdateCabang }) => {
     alamatCabang: '',
   });
 
-  // Initialize form data when cabang data changes
   useEffect(() => {
     if (cabangData) {
       setFormData({
@@ -21,16 +20,23 @@ const EditCabangModal = ({ isOpen, onClose, cabangData, onUpdateCabang }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onUpdateCabang(formData);
-    onClose();
+
+    // Ubah ke format yang backend butuh
+    const payload = {
+      id: formData.id,
+      namaCabang: formData.namaCabang,
+      alamatCabang: formData.alamatCabang,
+    };
+
+    onUpdateCabang(payload); // dikirim ke CabContent
   };
 
   if (!isOpen) return null;
@@ -42,7 +48,7 @@ const EditCabangModal = ({ isOpen, onClose, cabangData, onUpdateCabang }) => {
           <h2>Edit Cabang</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="namaCabang">Nama Cabang:</label>
@@ -56,7 +62,7 @@ const EditCabangModal = ({ isOpen, onClose, cabangData, onUpdateCabang }) => {
               placeholder="Contoh: Jakarta Timur"
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="alamatCabang">Alamat Cabang:</label>
             <textarea
@@ -69,7 +75,7 @@ const EditCabangModal = ({ isOpen, onClose, cabangData, onUpdateCabang }) => {
               placeholder="Contoh: Jl. Panti, no 57 Jakarta Timur"
             ></textarea>
           </div>
-          
+
           <div className="modal-actions">
             <button type="button" className="cancel-btn" onClick={onClose}>Cancel</button>
             <button type="submit" className="submit-btn">Update Cabang</button>
