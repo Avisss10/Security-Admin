@@ -1,14 +1,50 @@
-### GET semua user level Security
-GET http://localhost:5000/api/user?level=Security
-### Tambah laporan hari ini
+POST http://localhost:5000/api/laporan
+Content-Type: application/json
+
+{
+  "id_user": 5,
+  "id_cabang": 2,
+  "jenis_laporan": "Dalam Gedung",
+  "judul_laporan": "Kondisi Lorong",
+  "kondisi_cuaca": "Berawan",
+  "deskripsi_laporan": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+}
+
+###
 POST http://localhost:5000/api/laporan
 Content-Type: application/json
 
 {
   "id_user": 4,
   "id_cabang": 1,
-  "jenis_laporan": "Luar Gedung",
-  "judul_laporan": "Aktivitas mencurigakan",
-  "kondisi_cuaca": "Cerah",
-  "deskripsi_laporan": "Seseorang berdiri lama di dekat pintu gerbang."
+  "jenis_laporan": "Dalam Gedung",
+  "judul_laporan": "Kondisi Lorong",
+  "kondisi_cuaca": "Berawan",
+  "deskripsi_laporan": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
 }
+
+### Upload Foto ke Laporan ID 12
+POST http://localhost:5000/api/laporan/14/foto
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="foto"; filename="lapor1.png"
+Content-Type: image/png
+
+< ./lapor1.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+###
+GET http://localhost:5000/api/laporan/14
+Content-Type: application/json
+
+### Get semua laporan arsip (7 hari terakhir)
+GET http://localhost:5000/api/laporan/arsip
+
+### Filter berdasarkan jenis
+GET http://localhost:5000/api/laporan/arsip?jenis=Luar Gedung
+
+### Filter berdasarkan cabang
+GET http://localhost:5000/api/laporan/arsip?cabang=2
+
+### Kombinasi filter
+GET http://localhost:5000/api/laporan/arsip?jenis=Luar Gedung&cabang=1

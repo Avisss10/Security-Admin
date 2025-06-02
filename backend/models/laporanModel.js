@@ -13,7 +13,7 @@ const Laporan = {
         l.kondisi_cuaca,
         l.deskripsi_laporan,
         l.created_at,
-        u.nama AS nama_user,
+        u.nama_user,
         u.nip,
         c.nama_cabang,
         GROUP_CONCAT(f.foto_path) AS foto_paths
@@ -31,7 +31,7 @@ const Laporan = {
     const query = `
       SELECT 
         l.*,
-        u.nama AS nama_user,
+        u.nama_user,
         u.nip,
         c.nama_cabang,
         GROUP_CONCAT(f.foto_path) AS foto_paths
@@ -61,7 +61,7 @@ const Laporan = {
         l.kondisi_cuaca,
         l.deskripsi_laporan,
         l.created_at,
-        u.nama AS nama_user,
+        u.nama_user,
         u.nip,
         c.nama_cabang,
         GROUP_CONCAT(f.foto_path) AS foto_paths
@@ -79,7 +79,7 @@ const Laporan = {
   filterLaporan: (params, callback) => {
   let query = `
     SELECT 
-      l.*, u.nama AS nama_user, u.nip, c.nama_cabang,
+      l.*, u.nama_user, u.nip, c.nama_cabang,
       GROUP_CONCAT(f.foto_path) AS foto_paths
     FROM laporan l
     JOIN user u ON l.id_user = u.id_user

@@ -1,3 +1,4 @@
+const db = require('../config/db');
 const Laporan = require('../models/laporanModel');
 
 exports.getAllLaporan = (req, res) => {
@@ -35,14 +36,43 @@ exports.deleteLaporan = (req, res) => {
 };
 
 exports.getRecentArsip = (req, res) => {
-  Laporan.getRecentArsip((err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    
-    results.forEach(row => {
-      row.foto_paths = row.foto_paths ? row.foto_paths.split(',') : [];
-    });
+const { jenis, cabang } = req.query;
 
-    res.json(results);
+  let sql = `
+    SELECT l.*, 
+           u.nama_user, u.nip, 
+           c.nama_cabang,
+           GROUP_CONCAT(f.foto_path) AS foto_list
+    FROM laporan l
+    JOIN user u ON l.id_user = u.id_user
+    JOIN cabang c ON u.id_cabang = c.id_cabang
+    LEFT JOIN foto_laporan f ON l.id_laporan = f.id_laporan
+    WHERE l.tanggal_laporan >= CURDATE() - INTERVAL 7 DAY
+  `;
+
+  const params = [];
+
+  if (jenis) {
+    sql += ' AND l.jenis_laporan = ?';
+    params.push(jenis);
+  }
+
+  if (cabang) {
+    sql += ' AND u.id_cabang = ?';
+    params.push(cabang);
+  }
+
+  sql += ' GROUP BY l.id_laporan ORDER BY l.tanggal_laporan DESC';
+
+  db.query(sql, params, (err, result) => {
+    if (err) return res.status(500).json({ error: 'Gagal ambil arsip laporan', details: err });
+
+    const formatted = result.map(r => ({
+      ...r,
+      foto_list: r.foto_list ? r.foto_list.split(',') : []
+    }));
+
+    res.json(formatted);
   });
 };
 

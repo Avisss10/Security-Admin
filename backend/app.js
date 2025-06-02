@@ -18,6 +18,8 @@ app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cabang', cabangRoutes);
 app.use('/api/laporan', laporanRoutes);
+app.use('/uploads', express.static('uploads'));
+
 
 
 

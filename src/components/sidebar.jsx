@@ -36,6 +36,7 @@ const Sidebar = () => {
           <BiArchive className='icon' />
           Archive
         </Link>
+
         <Link to="/logout" className="item logout">
           <BiLogOut className='icon' />
           Logout
