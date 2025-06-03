@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { BiPencil } from 'react-icons/bi';
+import { BiPencil, BiTrash } from 'react-icons/bi';
 import '../styles/secContent.css';
 import SecHeader from './SecHeader';
 import EditSecurityModal from './secEdit';
 import axios from 'axios';
+import DelConfirm from './delConfirm';
 
 const SecContent = () => {
   const [securityAccounts, setSecurityAccounts] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [securityToEdit, setSecurityToEdit] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [securityToDelete, setSecurityToDelete] = useState(null);
 
   // 🔄 Fetch data dari backend
   const fetchSecurityAccounts = async () => {
@@ -66,6 +69,29 @@ const SecContent = () => {
     }
   };
 
+      const handleOpenDeleteModal = (security) => {
+    setSecurityToDelete(security);
+    setIsDeleteModalOpen(true);
+  };
+
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSecurityToDelete(null);
+  };
+
+    const handleConfirmDelete = async () => {
+      try {
+        await axios.delete(`http://localhost:5000/api/user/${securityToDelete.id}`    
+        );
+        fetchSecurityData();
+      } catch (err) {
+        console.error('Gagal menghapus security:', err);
+      } finally {
+        handleCloseDeleteModal();
+      }
+    };
+
   return (
     <>
       <SecHeader onAddSecurity={handleAddSecurity} />
@@ -93,13 +119,20 @@ const SecContent = () => {
                   <td>{account.password}</td>
                   <td>{account.cabang}</td>
                   <td>{account.level}</td>
-                  <td>
+                  <td className='btn-group'>
                     <button 
                       className="edit-btn"
                       onClick={() => handleOpenEditModal(account)}
                     >
                       <BiPencil className="edit-icon" />
                       Edit
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleOpenDeleteModal(account)}
+                    >
+                      <BiTrash className="delete-icon" /> 
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -115,6 +148,12 @@ const SecContent = () => {
         onClose={handleCloseEditModal}
         securityData={securityToEdit}
         onUpdateSecurity={handleUpdateSecurity}
+      />
+      <DelConfirm 
+        isOpen={isDeleteModalOpen}
+        message={`Apakah Anda yakin ingin menghapus security "${securityToDelete?.name}"?`}
+        onCancel={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
       />
     </>
   );
