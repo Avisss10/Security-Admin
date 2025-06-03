@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BiPencil } from 'react-icons/bi';
 import '../styles/cabContent.css';
-import CabHeader from './CabHeader';
+import CabHeader from './cabHeader';
 import EditCabangModal from './cabEdit';
 import axios from 'axios';
 

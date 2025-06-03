@@ -48,3 +48,7 @@ GET http://localhost:5000/api/laporan/arsip?cabang=2
 
 ### Kombinasi filter
 GET http://localhost:5000/api/laporan/arsip?jenis=Luar Gedung&cabang=1
+
+###
+GET http://localhost:5000/api/laporan/jenis-laporan
+

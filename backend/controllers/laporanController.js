@@ -35,8 +35,38 @@ exports.deleteLaporan = (req, res) => {
   });
 };
 
+exports.getJenisLaporan = (req, res) => {
+  const sql = `
+    SELECT COLUMN_TYPE 
+    FROM INFORMATION_SCHEMA.COLUMNS 
+    WHERE TABLE_NAME = 'laporan' 
+      AND COLUMN_NAME = 'jenis_laporan' 
+      AND TABLE_SCHEMA = 'security_db'
+  `;
+
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.error('Gagal ambil jenis laporan ENUM:', err);
+      return res.status(500).json({ message: 'Gagal ambil jenis laporan' });
+    }
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Kolom tidak ditemukan' });
+    }
+
+    const enumString = rows[0].COLUMN_TYPE;
+    const enumValues = enumString
+      .replace(/^enum\(/, '')
+      .replace(/\)$/, '')
+      .split(',')
+      .map(val => val.replace(/'/g, ''));
+
+    res.json(enumValues);
+  });
+};
+
 exports.getRecentArsip = (req, res) => {
-const { jenis, cabang } = req.query;
+  const { jenis, id_cabang, dari, sampai } = req.query; // Ganti "cabang" → "id_cabang"
 
   let sql = `
     SELECT l.*, 
@@ -47,19 +77,31 @@ const { jenis, cabang } = req.query;
     JOIN user u ON l.id_user = u.id_user
     JOIN cabang c ON u.id_cabang = c.id_cabang
     LEFT JOIN foto_laporan f ON l.id_laporan = f.id_laporan
-    WHERE l.tanggal_laporan >= CURDATE() - INTERVAL 7 DAY
+    WHERE 1=1
   `;
 
   const params = [];
+
+  if (dari) {
+    sql += ' AND l.tanggal_laporan >= ?';
+    params.push(dari);
+  } else {
+    sql += ' AND l.tanggal_laporan >= CURDATE() - INTERVAL 7 DAY';
+  }
+
+  if (sampai) {
+    sql += ' AND l.tanggal_laporan <= ?';
+    params.push(sampai);
+  }
 
   if (jenis) {
     sql += ' AND l.jenis_laporan = ?';
     params.push(jenis);
   }
 
-  if (cabang) {
+  if (id_cabang) {
     sql += ' AND u.id_cabang = ?';
-    params.push(cabang);
+    params.push(id_cabang);
   }
 
   sql += ' GROUP BY l.id_laporan ORDER BY l.tanggal_laporan DESC';
@@ -76,23 +118,6 @@ const { jenis, cabang } = req.query;
   });
 };
 
-exports.filterLaporan = (req, res) => {
-  const params = {
-    tanggal: req.query.tanggal,
-    jenis: req.query.jenis,
-    id_cabang: req.query.id_cabang
-  };
-
-  Laporan.filterLaporan(params, (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-
-    results.forEach(r => {
-      r.foto_paths = r.foto_paths ? r.foto_paths.split(',') : [];
-    });
-
-    res.json(results);
-  });
-};
 
 const { Parser } = require('json2csv');
 exports.exportLaporan = (req, res) => {

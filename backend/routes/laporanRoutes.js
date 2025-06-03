@@ -99,11 +99,12 @@ router.post('/:id/foto', upload.single('foto'), (req, res) => {
 
 
 router.get('/export', laporanController.exportLaporan);
-router.get('/filter', laporanController.filterLaporan);
-router.get('/', laporanController.getAllLaporan);
+router.get('/jenis-laporan', laporanController.getJenisLaporan);
 router.get('/arsip', laporanController.getRecentArsip);
+router.get('/', laporanController.getAllLaporan);
 router.get('/:id', laporanController.getLaporanById);
 router.delete('/:id', laporanController.deleteLaporan);
+
 
 
 

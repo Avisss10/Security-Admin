@@ -1,16 +1,31 @@
 import React from 'react';
+import ArcPost from './arcPost';
+import '../../styles/archive.css';
 
-const ArchiveList = ({ laporan }) => {
+const ArchiveList = ({ laporan, onDelete }) => {
+  if (!laporan || laporan.length === 0) {
+    return <p className="no-post-message">🔍 Tidak ada laporan ditemukan.</p>;
+  }
+
   return (
-    <div className="laporan-list">
+    <div className="posts-containerarc">
       {laporan.map((lapor) => (
-        <div className="laporan-item" key={lapor.id_laporan}>
-          <h4>{lapor.judul}</h4>
-          <p><strong>Jenis:</strong> {lapor.jenis}</p>
-          <p><strong>Cuaca:</strong> {lapor.cuaca}</p>
-          <p><strong>Deskripsi:</strong> {lapor.deskripsi}</p>
-          <p><strong>Tanggal:</strong> {lapor.tanggal}</p>
-        </div>
+        <ArcPost
+          key={lapor.id_laporan}
+          id_laporan={lapor.id_laporan}
+          nama_user={lapor.nama_user}
+          nip={lapor.nip}
+          nama_cabang={lapor.nama_cabang}
+          deskripsi={lapor.deskripsi_laporan}
+          jenis={lapor.jenis_laporan}
+          judul={lapor.judul_laporan}
+          cuaca={lapor.kondisi_cuaca}
+          hari={lapor.hari_laporan}
+          tanggal={lapor.tanggal_laporan}
+          waktu={lapor.waktu_laporan}
+          foto_list={lapor.foto_list}
+          onDelete={onDelete}
+        />
       ))}
     </div>
   );

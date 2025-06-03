@@ -1,8 +1,8 @@
 import React from 'react';
 
 const ArcHeader = () => (
-  <div className="arc-header">
-    <h2>Archive</h2>
+  <div className="content--header">
+    <h2 className="header--title">Archive</h2>
   </div>
 );
 
