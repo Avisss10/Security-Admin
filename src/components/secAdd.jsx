@@ -8,37 +8,40 @@ const AddSecurityModal = ({ isOpen, onClose, onAddSecurity }) => {
     nama_user: '',
     password: '',
     id_cabang: '',
-    id_level: 2
+    id_level: 2,
   });
 
   const [cabangOptions, setCabangOptions] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/cabang')
-      .then(res => setCabangOptions(res.data))
-      .catch(err => console.error('Gagal fetch cabang:', err));
-  }, []);
+    if (isOpen) {
+      axios
+        .get('http://localhost:5000/api/cabang')
+        .then((res) => setCabangOptions(res.data))
+        .catch((err) => console.error('Gagal fetch cabang:', err));
+    }
+  }, [isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onAddSecurity(formData); // akan dikirim ke backend oleh SecContent
-    // Reset form
-    setFormData({
-      nip: '',
-      nama_user: '',
-      password: '',
-      id_cabang: '',
-      id_level: 2
-    });
-    onClose();
+    try {
+      await onAddSecurity(formData);
+      setFormData({
+        nip: '',
+        nama_user: '',
+        password: '',
+        id_cabang: '',
+        id_level: 2,
+      });
+      onClose();
+    } catch (error) {
+      console.error('Gagal menambahkan security:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -47,7 +50,7 @@ const AddSecurityModal = ({ isOpen, onClose, onAddSecurity }) => {
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Add New Security</h2>
+          <h2>Tambah Security</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
 
@@ -104,12 +107,12 @@ const AddSecurityModal = ({ isOpen, onClose, onAddSecurity }) => {
 
           <div className="form-group">
             <label>Level:</label>
-            <input type="text" value="Security" disabled readOnly />
+            <input type="text" value="Security" readOnly disabled />
           </div>
 
           <div className="modal-actions">
-            <button type="button" className="cancel-btn" onClick={onClose}>Cancel</button>
-            <button type="submit" className="submit-btn">Add Security</button>
+            <button type="button" className="cancel-btn" onClick={onClose}>Batal</button>
+            <button type="submit" className="submit-btn">Tambah</button>
           </div>
         </form>
       </div>

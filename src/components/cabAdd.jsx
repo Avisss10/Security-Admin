@@ -18,21 +18,14 @@ const AddCabangModal = ({ isOpen, onClose, onAddCabang }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Kirim data ke parent (CabContent) dalam format sesuai backend
     const newCabang = {
       nama_cabang: formData.namaCabang,
       alamat_cabang: formData.alamatCabang,
     };
 
-    onAddCabang(newCabang);
-
-    // Reset form
-    setFormData({
-      namaCabang: '',
-      alamatCabang: '',
-    });
-
-    onClose();
+    onAddCabang(newCabang); // kirim ke parent (CabHeader -> CabContent)
+    setFormData({ namaCabang: '', alamatCabang: '' }); // reset form
+    onClose(); // tutup modal
   };
 
   if (!isOpen) return null;

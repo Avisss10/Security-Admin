@@ -60,12 +60,17 @@ exports.updateUser = (req, res) => {
 // DELETE: hapus user
 exports.deleteUser = (req, res) => {
   const { id } = req.params;
+  console.log('Mencoba menghapus user dengan ID:', id); // log tambahan
 
   db.query('DELETE FROM user WHERE id_user = ?', [id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) {
+      console.error('Error saat delete user:', err); // log error
+      return res.status(500).json({ error: err.message });
+    }
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'User tidak ditemukan' });
     }
     res.json({ message: 'User berhasil dihapus' });
   });
 };
+

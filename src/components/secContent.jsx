@@ -3,8 +3,8 @@ import { BiPencil, BiTrash } from 'react-icons/bi';
 import '../styles/secContent.css';
 import SecHeader from './SecHeader';
 import EditSecurityModal from './secEdit';
-import axios from 'axios';
 import DelConfirm from './delConfirm';
+import axios from 'axios';
 
 const SecContent = () => {
   const [securityAccounts, setSecurityAccounts] = useState([]);
@@ -37,17 +37,17 @@ const SecContent = () => {
     fetchSecurityAccounts();
   }, []);
 
-  // ✅ Tambah security (dari SecHeader)
+  // ➕ Tambah security (dipanggil dari SecHeader)
   const handleAddSecurity = async (newSecurity) => {
     try {
       await axios.post('http://localhost:5000/api/user', newSecurity);
-      fetchSecurityAccounts(); // refresh
+      fetchSecurityAccounts(); // refresh otomatis
     } catch (err) {
       console.error('Gagal tambah security:', err);
     }
   };
 
-  // ✅ Buka modal edit
+  // ✏️ Edit security
   const handleOpenEditModal = (security) => {
     setSecurityToEdit(security);
     setIsEditModalOpen(true);
@@ -58,39 +58,37 @@ const SecContent = () => {
     setSecurityToEdit(null);
   };
 
-  // ✅ Update security (PUT)
   const handleUpdateSecurity = async (updatedSecurity) => {
     try {
       await axios.put(`http://localhost:5000/api/user/${updatedSecurity.id}`, updatedSecurity);
-      fetchSecurityAccounts(); // refresh
+      fetchSecurityAccounts(); // refresh otomatis
       handleCloseEditModal();
     } catch (err) {
       console.error('Gagal update security:', err);
     }
   };
 
-      const handleOpenDeleteModal = (security) => {
+  // 🗑️ Delete security
+  const handleOpenDeleteModal = (security) => {
     setSecurityToDelete(security);
     setIsDeleteModalOpen(true);
   };
-
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setSecurityToDelete(null);
   };
 
-    const handleConfirmDelete = async () => {
-      try {
-        await axios.delete(`http://localhost:5000/api/user/${securityToDelete.id}`    
-        );
-        fetchSecurityData();
-      } catch (err) {
-        console.error('Gagal menghapus security:', err);
-      } finally {
-        handleCloseDeleteModal();
-      }
-    };
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/api/user/${securityToDelete.id}`);
+      fetchSecurityAccounts(); // refresh otomatis
+    } catch (err) {
+      console.error('Gagal menghapus security:', err);
+    } finally {
+      handleCloseDeleteModal();
+    }
+  };
 
   return (
     <>
@@ -119,8 +117,8 @@ const SecContent = () => {
                   <td>{account.password}</td>
                   <td>{account.cabang}</td>
                   <td>{account.level}</td>
-                  <td className='btn-group'>
-                    <button 
+                  <td className="btn-group">
+                    <button
                       className="edit-btn"
                       onClick={() => handleOpenEditModal(account)}
                     >
@@ -131,7 +129,7 @@ const SecContent = () => {
                       className="delete-btn"
                       onClick={() => handleOpenDeleteModal(account)}
                     >
-                      <BiTrash className="delete-icon" /> 
+                      <BiTrash className="delete-icon" />
                       Delete
                     </button>
                   </td>
@@ -143,13 +141,15 @@ const SecContent = () => {
       </div>
 
       {/* Modal Edit */}
-      <EditSecurityModal 
+      <EditSecurityModal
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
         securityData={securityToEdit}
         onUpdateSecurity={handleUpdateSecurity}
       />
-      <DelConfirm 
+
+      {/* Modal Delete */}
+      <DelConfirm
         isOpen={isDeleteModalOpen}
         message={`Apakah Anda yakin ingin menghapus security "${securityToDelete?.name}"?`}
         onCancel={handleCloseDeleteModal}

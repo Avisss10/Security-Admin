@@ -3,8 +3,8 @@ import { BiPencil, BiTrash } from 'react-icons/bi';
 import '../styles/cabContent.css';
 import CabHeader from './cabHeader';
 import EditCabangModal from './cabEdit';
-import axios from 'axios';
 import DelConfirm from './delConfirm';
+import axios from 'axios';
 
 const CabContent = () => {
   const [cabangData, setCabangData] = useState([]);
@@ -13,15 +13,14 @@ const CabContent = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [cabangToDelete, setCabangToDelete] = useState(null);
 
-
-  // Fetch semua cabang dari backend
+  // Fetch semua data cabang
   const fetchCabangData = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/cabang');
-      const formatted = res.data.map(c => ({
+      const formatted = res.data.map((c) => ({
         id: c.id_cabang,
         namaCabang: c.nama_cabang,
-        alamatCabang: c.alamat_cabang
+        alamatCabang: c.alamat_cabang,
       }));
       setCabangData(formatted);
     } catch (err) {
@@ -33,25 +32,25 @@ const CabContent = () => {
     fetchCabangData();
   }, []);
 
-  // Tambah cabang ke backend
+  // Tambah cabang
   const handleAddCabang = async (newCabang) => {
     try {
       await axios.post('http://localhost:5000/api/cabang', {
-      nama_cabang: newCabang.namaCabang,
-      alamat_cabang: newCabang.alamatCabang
-    });
-      fetchCabangData();
+        nama_cabang: newCabang.nama_cabang,
+        alamat_cabang: newCabang.alamat_cabang,
+      });
+      fetchCabangData(); // refresh list setelah tambah
     } catch (err) {
       console.error('Gagal tambah cabang:', err);
     }
   };
 
-  // Edit cabang
+  // Update cabang
   const handleUpdateCabang = async (updatedCabang) => {
     try {
       await axios.put(`http://localhost:5000/api/cabang/${updatedCabang.id}`, {
         nama_cabang: updatedCabang.namaCabang,
-        alamat_cabang: updatedCabang.alamatCabang
+        alamat_cabang: updatedCabang.alamatCabang,
       });
       fetchCabangData();
       handleCloseEditModal();
@@ -70,7 +69,7 @@ const CabContent = () => {
     setCabangToEdit(null);
   };
 
-    const handleOpenDeleteModal = (cabang) => {
+  const handleOpenDeleteModal = (cabang) => {
     setCabangToDelete(cabang);
     setIsDeleteModalOpen(true);
   };
@@ -81,9 +80,9 @@ const CabContent = () => {
   };
 
   const handleConfirmDelete = async () => {
+    if (!cabangToDelete) return;
     try {
-      await axios.delete(`http://localhost:5000/api/cabang/${cabangToDelete.id}`    
-      );
+      await axios.delete(`http://localhost:5000/api/cabang/${cabangToDelete.id}`);
       fetchCabangData();
     } catch (err) {
       console.error('Gagal menghapus cabang:', err);
@@ -92,10 +91,10 @@ const CabContent = () => {
     }
   };
 
-
   return (
     <>
       <CabHeader onAddCabang={handleAddCabang} />
+
       <div className="cab-content">
         <div className="cabang-table-container">
           <table className="cabang-table">
@@ -104,7 +103,7 @@ const CabContent = () => {
                 <th>ID</th>
                 <th>Nama Cabang</th>
                 <th>Alamat Cabang</th>
-                <th>Custom</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -113,15 +112,14 @@ const CabContent = () => {
                   <td>{cabang.id}</td>
                   <td>{cabang.namaCabang}</td>
                   <td>{cabang.alamatCabang}</td>
-
                   <td className="btn-group">
-                    <button 
+                    <button
                       className="edit-btn"
                       onClick={() => handleOpenEditModal(cabang)}
                     >
                       <BiPencil className="edit-icon" /> Edit
                     </button>
-                    <button 
+                    <button
                       className="delete-btn"
                       onClick={() => handleOpenDeleteModal(cabang)}
                     >
@@ -135,13 +133,16 @@ const CabContent = () => {
         </div>
       </div>
 
-      <EditCabangModal 
+      {/* Modal Edit */}
+      <EditCabangModal
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
         cabangData={cabangToEdit}
         onUpdateCabang={handleUpdateCabang}
       />
-      <DelConfirm 
+
+      {/* Modal Delete */}
+      <DelConfirm
         isOpen={isDeleteModalOpen}
         message={`Apakah Anda yakin ingin menghapus cabang "${cabangToDelete?.namaCabang}"?`}
         onCancel={handleCloseDeleteModal}
