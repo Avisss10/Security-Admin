@@ -13,10 +13,9 @@ const App = () => {
 
   // Cek apakah user sudah login saat pertama kali render
   useEffect(() => {
-    const loggedInUser = localStorage.getItem('user');
-    if (loggedInUser) {
-      setIsAuthenticated(true);
-    }
+    // Clear localStorage on app start to force login
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
   }, []);
 
   // Simpan data user ke localStorage saat login
