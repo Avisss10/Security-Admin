@@ -65,53 +65,29 @@ exports.getJenisLaporan = (req, res) => {
   });
 };
 
+const getArsipLaporan = (req, res) => {
+  Laporan.getArsipLaporan((err, result) => {
+    if (err) {
+      return res.status(500).json({ message: 'Gagal ambil arsip laporan' });
+    }
+    res.status(200).json(result);
+  });
+}
+exports.getArsipLaporan = getArsipLaporan;
+
+
+
 exports.getRecentArsip = (req, res) => {
-  const { jenis, id_cabang, dari, sampai } = req.query; // Ganti "cabang" → "id_cabang"
+  const { jenis, id_cabang, dari, sampai } = req.query;
 
-  let sql = `
-    SELECT l.*, 
-           u.nama_user, u.nip, 
-           c.nama_cabang,
-           GROUP_CONCAT(f.foto_path) AS foto_list
-    FROM laporan l
-    JOIN user u ON l.id_user = u.id_user
-    JOIN cabang c ON u.id_cabang = c.id_cabang
-    LEFT JOIN foto_laporan f ON l.id_laporan = f.id_laporan
-    WHERE 1=1
-  `;
-
-  const params = [];
-
-  if (dari) {
-    sql += ' AND l.tanggal_laporan >= ?';
-    params.push(dari);
-  } else {
-    sql += ' AND l.tanggal_laporan >= CURDATE() - INTERVAL 7 DAY';
-  }
-
-  if (sampai) {
-    sql += ' AND l.tanggal_laporan <= ?';
-    params.push(sampai);
-  }
-
-  if (jenis) {
-    sql += ' AND l.jenis_laporan = ?';
-    params.push(jenis);
-  }
-
-  if (id_cabang) {
-    sql += ' AND u.id_cabang = ?';
-    params.push(id_cabang);
-  }
-
-  sql += ' GROUP BY l.id_laporan ORDER BY l.tanggal_laporan DESC';
-
-  db.query(sql, params, (err, result) => {
-    if (err) return res.status(500).json({ error: 'Gagal ambil arsip laporan', details: err });
+  Laporan.getArsipLaporanFiltered({ jenis, id_cabang, dari, sampai }, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: 'Gagal ambil arsip laporan', details: err });
+    }
 
     const formatted = result.map(r => ({
       ...r,
-      foto_list: r.foto_list ? r.foto_list.split(',') : []
+      foto_paths: r.foto_paths ? r.foto_paths.split(',') : []
     }));
 
     res.json(formatted);

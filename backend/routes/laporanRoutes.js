@@ -1,7 +1,15 @@
 const db = require('../config/db'); // ✅ tambahkan ini
 const express = require('express');
 const router = express.Router();
-const laporanController = require('../controllers/laporanController');
+const { 
+  exportLaporan,
+  getJenisLaporan,
+  getArsipLaporan,
+  deleteLaporan,
+  getAllLaporan,
+  getLaporanById 
+} = require('../controllers/laporanController');
+
 const upload = require('../middleware/uploadFoto');
 
 router.post('/', (req, res) => {
@@ -61,24 +69,6 @@ router.get('/today', (req, res) => {
   });
 });
 
-router.delete('/:id', (req, res) => {
-  const id = req.params.id;
-
-  // Hapus foto laporan dulu (karena FK constraint)
-  db.query('DELETE FROM foto_laporan WHERE id_laporan = ?', [id], (err1) => {
-    if (err1) return res.status(500).json({ error: err1.message });
-
-    // Hapus laporan
-    db.query('DELETE FROM laporan WHERE id_laporan = ?', [id], (err2) => {
-      if (err2) return res.status(500).json({ error: err2.message });
-
-      res.json({ message: 'Laporan berhasil dihapus' });
-    });
-  });
-});
-
-
-
 router.post('/:id/foto', upload.single('foto'), (req, res) => {
   const id_laporan = req.params.id;
   const foto_path = req.file.filename;
@@ -97,14 +87,41 @@ router.post('/:id/foto', upload.single('foto'), (req, res) => {
   });
 });
 
+router.get('/arsip', (req, res) => {
+  const { jenis, id_cabang, dari, sampai } = req.query;
+  // Jika ada filter, pakai getArsipLaporanFiltered
+  if (jenis || id_cabang || dari || sampai) {
+    require('../models/laporanModel').getArsipLaporanFiltered(
+      { jenis, id_cabang, dari, sampai },
+      (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        // Format foto_paths jadi array
+        const formatted = result.map(r => ({
+          ...r,
+          foto_paths: r.foto_paths ? r.foto_paths.split(',') : []
+        }));
+        res.json(formatted);
+      }
+    );
+  } else {
+    // Default: ambil semua arsip (lebih dari 7 hari lalu)
+    require('../models/laporanModel').getArsipLaporan((err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      const formatted = result.map(r => ({
+        ...r,
+        foto_paths: r.foto_paths ? r.foto_paths.split(',') : []
+      }));
+      res.json(formatted);
+    });
+  }
+});
 
-router.get('/export', laporanController.exportLaporan);
-router.get('/jenis-laporan', laporanController.getJenisLaporan);
-router.get('/arsip', laporanController.getRecentArsip);
-router.get('/', laporanController.getAllLaporan);
-router.get('/:id', laporanController.getLaporanById);
-router.delete('/:id', laporanController.deleteLaporan);
 
+router.get('/export', exportLaporan);
+router.get('/jenis-laporan', getJenisLaporan);
+router.delete('/:id', deleteLaporan);
+router.get('/', getAllLaporan);
+router.get('/:id', getLaporanById);
 
 
 
