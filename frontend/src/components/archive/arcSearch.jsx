@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../../styles/search.css';
 import axios from 'axios';
 
-const ArchiveSearch = ({ onSearch, onReset }) => {
+const ArchiveSearch = ({ onSearch }) => {
   const [filter, setFilter] = useState({
     jenis: '',
     id_cabang: '',
@@ -33,45 +33,44 @@ const ArchiveSearch = ({ onSearch, onReset }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const { dari, sampai } = filter;
-
     const now = new Date();
-    const semingguLalu = new Date();
-    semingguLalu.setDate(now.getDate() - 7);
+    let dariDate = null;
+    let sampaiDate = now;
 
-    // Konversi tanggal ke objek Date jika diisi
-    const dariDate = dari ? new Date(dari) : null;
-    const sampaiDate = sampai ? new Date(sampai) : null;
-
-    // Validasi 1: dari > sampai
-    if (dari && sampai && dariDate > sampaiDate) {
-      alert('Tanggal "Dari" tidak boleh setelah "Sampai"');
-      return;
+    if (filter.date_range === 'today') {
+      dariDate = new Date(now.toISOString().split('T')[0]); // tanggal hari ini
+    } else if (filter.date_range === '7days') {
+      const semingguLalu = new Date();
+      semingguLalu.setDate(now.getDate() - 7);
+      dariDate = semingguLalu;
     }
 
-    // Validasi 2: dari/sampai lebih dari 7 hari ke belakang
-    if ((dariDate && dariDate < semingguLalu) || (sampaiDate && sampaiDate < semingguLalu)) {
-      alert('Tanggal tidak boleh lebih dari 7 hari ke belakang');
-      return;
-    }
+    const finalFilter = {
+      ...filter,
+      dari: dariDate ? dariDate.toISOString().split('T')[0] : '',
+      sampai: sampaiDate.toISOString().split('T')[0],
+    };
 
-    // Jika semua validasi lolos, kirim filter
-    onSearch(filter);
+    onSearch(finalFilter);
   };
 
   const handleReset = () => {
     setFilter({
       jenis: '',
       id_cabang: '',
+      date_range: ''
+    });
+    onSearch({
+      jenis: '',
+      id_cabang: '',
       dari: '',
       sampai: ''
     });
-    if (onReset) {
-      onReset();
-    }
   };
 
-  return (
+
+
+return (
     <div className='post'>
       <form className="search-row" onSubmit={handleSubmit}>
         <div className="input-group">
@@ -97,34 +96,28 @@ const ArchiveSearch = ({ onSearch, onReset }) => {
         </div>
 
         <div className="input-group">
-          <label htmlFor="dari">Dari Tanggal:</label>
-          <input
-            type="date"
-            name="dari"
-            value={filter.dari}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="input-group">
-          <label htmlFor="sampai">Sampai Tanggal:</label>
-          <input
-            type="date"
-            name="sampai"
-            value={filter.sampai}
-            onChange={handleChange}
-          />
+          <label htmlFor="date_range">Rentang:</label>
+          <select
+            name="date_range"
+            value={filter.date_range || ''}
+            onChange={(e) => setFilter({ ...filter, date_range: e.target.value })}
+          >
+            <option value="">Pilih Rentang</option>
+            <option value="today">Hari ini</option>
+            <option value="7days">7 Hari Kebalakang</option>
+          </select>
         </div>
 
         {/* Tombol di luar input-group */}
-        <button type="submit" className="btn-search">Cari</button>
-        <button type="button" className="btn-reset btn-search" onClick={handleReset} style={{ marginLeft: '10px', backgroundColor: '#d9534f', borderColor: '#d43f3a' }}>Reset</button>
+        <div className="button-group">
+          <button type="submit" className="btn-search">Cari</button>
+          <button type="button" className="btn-reset" onClick={handleReset}>Reset</button>
+        </div>
       </form>
 
+
       <div className="search-tips">
-        <p>·········· </p>
-        <p>🔍 Gunakan filter untuk mencari laporan berdasarkan jenis, cabang, dan tanggal.</p>
-        <p>📅 Tanggal harus berada dalam rentang 7 hari terakhir.</p>
+        <p>📊 Pilih rentang "Hari ini" untuk laporan terbaru atau "7 Hari Kebelakang" untuk laporan minggu ini.</p>
       </div>
     </div>
   );

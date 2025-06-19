@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ContentHeader from './contentHeader';
 import Post from './post';
@@ -6,55 +6,104 @@ import '../../styles/content.css';
 
 const Content = () => {
   const [laporanHariIni, setLaporanHariIni] = useState([]);
+  const [filteredLaporan, setFilteredLaporan] = useState([]);
+  const [cabangOptions, setCabangOptions] = useState([]);
+  const [selectedCabang, setSelectedCabang] = useState('');
 
   useEffect(() => {
     fetchLaporanHariIni();
+    fetchCabangOptions();
   }, []);
 
   const fetchLaporanHariIni = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/laporan/today');
       setLaporanHariIni(res.data);
+      setFilteredLaporan(res.data);
     } catch (err) {
       console.error('Gagal fetch laporan hari ini:', err);
     }
   };
-  
-  const handleDeleteLaporan = async (id) => {
-  try {
-    await axios.delete(`http://localhost:5000/api/laporan/${id}`);
-    setLaporanHariIni(prev => prev.filter(l => l.id_laporan !== id));
-  } catch (err) {
-    console.error('Gagal hapus laporan:', err);
-  }
-};
 
+  const fetchCabangOptions = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/cabang');
+      // Assuming the API returns an array of cabang objects with a 'nama_cabang' property
+      const cabangNames = res.data.map(cabang => cabang.nama_cabang).filter(Boolean);
+      setCabangOptions(cabangNames);
+    } catch (err) {
+      console.error('Gagal fetch cabang options:', err);
+    }
+  };
+
+  const handleDeleteLaporan = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/laporan/${id}`);
+      setLaporanHariIni(prev => prev.filter(l => l.id_laporan !== id));
+      setFilteredLaporan(prev => prev.filter(l => l.id_laporan !== id));
+    } catch (err) {
+      console.error('Gagal hapus laporan:', err);
+    }
+  };
+
+  const handleCabangChange = (value) => {
+    setSelectedCabang(value);
+    if (!value) {
+      setFilteredLaporan(laporanHariIni);
+    } else {
+      const filtered = laporanHariIni.filter(l => l.nama_cabang === value);
+      setFilteredLaporan(filtered);
+    }
+  };
+
+  const handleSearch = () => {
+    if (!selectedCabang) {
+      setFilteredLaporan(laporanHariIni);
+    } else {
+      const filtered = laporanHariIni.filter(l => l.nama_cabang === selectedCabang);
+      setFilteredLaporan(filtered);
+    }
+  };
 
   return (
     <div className="content">
-      {/* ✅ Header */}
-      <ContentHeader />
+      {/* Header with filter */}
+      <ContentHeader
+        cabangOptions={cabangOptions}
+        selectedCabang={selectedCabang}
+        onCabangChange={handleCabangChange}
+        onSearch={handleSearch}
+      />
 
-      {/* ✅ Isi dashboard */}
-      {laporanHariIni.length === 0 ? (
-        <p>Tidak ada laporan hari ini.</p>
+      {/* Filter description */}
+      <div className="filter-description" style={{ marginBottom: '1rem', fontWeight: 'bold' }}>
+        {selectedCabang ? ` ${selectedCabang}` : ''}
+      </div>
+
+      {/* Dashboard content */}
+      {filteredLaporan.length === 0 ? (
+        <p>
+          {selectedCabang
+            ? `Belum ada laporan dari cabang ${selectedCabang}`
+            : 'Belum ada laporan hari ini.'}
+        </p>
       ) : (
-        laporanHariIni.map((laporan) => (
-        <Post
-          key={laporan.id_laporan}
-          nama_user={laporan.nama_user}
-          nip={laporan.nip}
-          nama_cabang={laporan.nama_cabang}
-          deskripsi={laporan.deskripsi_laporan}
-          jenis={laporan.jenis_laporan}
-          judul={laporan.judul_laporan}
-          cuaca={laporan.kondisi_cuaca}
-          hari={laporan.hari_laporan}
-          waktu={laporan.waktu_laporan}
-          tanggal={laporan.tanggal_laporan}
-          foto_list={laporan.foto_list}
-          onDelete={() => handleDeleteLaporan(laporan.id_laporan)}
-        />
+        filteredLaporan.map((laporan) => (
+          <Post
+            key={laporan.id_laporan}
+            nama_user={laporan.nama_user}
+            nip={laporan.nip}
+            nama_cabang={laporan.nama_cabang}
+            deskripsi={laporan.deskripsi_laporan}
+            jenis={laporan.jenis_laporan}
+            judul={laporan.judul_laporan}
+            cuaca={laporan.kondisi_cuaca}
+            hari={laporan.hari_laporan}
+            waktu={laporan.waktu_laporan}
+            tanggal={laporan.tanggal_laporan}
+            foto_list={laporan.foto_list}
+            onDelete={() => handleDeleteLaporan(laporan.id_laporan)}
+          />
         ))
       )}
     </div>

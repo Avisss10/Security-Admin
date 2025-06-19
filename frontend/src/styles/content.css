@@ -69,3 +69,23 @@
     flex-direction: column;
     gap: 20px;
 }
+
+.content-header-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  width: auto;
+}
+
+.filter-container select {
+  width: 250px;
+  max-width: 250px;
+}
