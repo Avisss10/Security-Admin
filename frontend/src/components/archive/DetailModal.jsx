@@ -65,17 +65,17 @@ const DetailModal = ({ isOpen, laporan, onClose }) => {
               </div>
               <div className="detail-item">
                 <label>Cuaca</label>
-                <span className={`cuaca-badge ${laporan.cuaca?.toLowerCase()}`}>
-                  {laporan.cuaca}
+                <span className={`cuaca-badge ${laporan.kondisi_cuaca?.toLowerCase()}`}>
+                  {laporan.kondisi_cuaca}
                 </span>
               </div>
               <div className="detail-item">
                 <label>Tanggal</label>
-                <span>{formatTanggal(laporan.tanggal)}</span>
+                <span>{formatTanggal(laporan.tanggal_laporan)}</span>
               </div>
               <div className="detail-item">
                 <label>Waktu</label>
-                <span>{formatJam(laporan.waktu)}</span>
+                <span>{formatJam(laporan.waktu_laporan)}</span>
               </div>
             </div>
           </div>
@@ -83,8 +83,8 @@ const DetailModal = ({ isOpen, laporan, onClose }) => {
           {/* Description */}
           <div className="description-section">
             <label>Deskripsi</label>
-            <div className="description-content">
-              {laporan.deskripsi || 'Tidak ada deskripsi'}
+          <div className="description-content">
+              {laporan.deskripsi_laporan || 'Tidak ada deskripsi'}
             </div>
           </div>
 

@@ -59,11 +59,11 @@ const ArchiveTable = ({ laporan, onDelete }) => {
                   </td>
                   <td className="judul-cell">{item.judul_laporan}</td>
                   <td>{item.nama_cabang}</td>
-                  <td>{formatTanggal(item.tanggal)}</td>
-                  <td>{formatJam(item.waktu)}</td>
+                  <td>{formatTanggal(item.tanggal_laporan)}</td>
+                  <td>{formatJam(item.waktu_laporan)}</td>
                   <td>
-                    <span className={`cuaca-badge ${item.cuaca?.toLowerCase()}`}>
-                      {item.cuaca}
+                    <span className={`cuaca-badge ${item.kondisi_cuaca?.toLowerCase()}`}>
+                      {item.kondisi_cuaca}
                     </span>
                   </td>
                   <td>

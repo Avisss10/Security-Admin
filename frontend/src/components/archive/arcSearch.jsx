@@ -104,7 +104,7 @@ return (
           >
             <option value="">Pilih Rentang</option>
             <option value="today">Hari ini</option>
-            <option value="7days">7 Hari Kebalakang</option>
+            <option value="7days">7 Hari Kebelakang</option>
           </select>
         </div>
 
