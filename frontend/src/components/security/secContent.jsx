@@ -5,6 +5,8 @@ import SecHeader from './SecHeader';
 import EditSecurityModal from './secEdit';
 import DelConfirm from '../delConfirm';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SecContent = () => {
   const [securityAccounts, setSecurityAccounts] = useState([]);
@@ -30,6 +32,7 @@ const SecContent = () => {
       setSecurityAccounts(formatted);
     } catch (err) {
       console.error('Gagal fetch security:', err);
+      toast.error('Gagal fetch security');
     }
   };
 
@@ -40,10 +43,18 @@ const SecContent = () => {
   // ➕ Tambah security (dipanggil dari SecHeader)
   const handleAddSecurity = async (newSecurity) => {
     try {
+      console.log('Adding security with data:', newSecurity);
       await axios.post('http://localhost:5000/api/user', newSecurity);
       fetchSecurityAccounts(); // refresh otomatis
+      toast.success('Security berhasil ditambahkan');
     } catch (err) {
-      console.error('Gagal tambah security:', err);
+      if (err.response) {
+        console.error('Gagal tambah security:', err.response.data);
+        toast.error('Gagal menambahkan security: ' + JSON.stringify(err.response.data));
+      } else {
+        console.error('Gagal tambah security:', err.message);
+        toast.error('Gagal menambahkan security: ' + err.message);
+      }
     }
   };
 
@@ -63,8 +74,14 @@ const SecContent = () => {
       await axios.put(`http://localhost:5000/api/user/${updatedSecurity.id}`, updatedSecurity);
       fetchSecurityAccounts(); // refresh otomatis
       handleCloseEditModal();
+      toast.success('Security berhasil diupdate');
     } catch (err) {
       console.error('Gagal update security:', err);
+      if (err.response) {
+        toast.error('Gagal mengupdate security: ' + JSON.stringify(err.response.data));
+      } else {
+        toast.error('Gagal mengupdate security: ' + err.message);
+      }
     }
   };
 
@@ -83,8 +100,14 @@ const SecContent = () => {
     try {
       await axios.delete(`http://localhost:5000/api/user/${securityToDelete.id}`);
       fetchSecurityAccounts(); // refresh otomatis
+      toast.success('Security berhasil dihapus');
     } catch (err) {
       console.error('Gagal menghapus security:', err);
+      if (err.response) {
+        toast.error('Gagal menghapus security: ' + JSON.stringify(err.response.data));
+      } else {
+        toast.error('Gagal menghapus security: ' + err.message);
+      }
     } finally {
       handleCloseDeleteModal();
     }
@@ -155,6 +178,7 @@ const SecContent = () => {
         onCancel={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
       />
+      <ToastContainer position="top-center" />
     </>
   );
 };

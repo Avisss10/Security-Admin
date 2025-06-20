@@ -15,6 +15,9 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 12px;
+  padding: 8px 16px;
+  border-radius: 8px 8px 0 0;
+  color: white;
 }
 
 .post-user {
@@ -35,8 +38,8 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
-  font-weight: 600; /* Digabung dari styling duplikat */
-  margin-bottom: 0.5rem; /* Digabung dari styling duplikat */
+  font-weight: 600;
+  margin-bottom: 0.5rem;
 }
 
 .post-name {
@@ -139,7 +142,6 @@
   transition: transform 0.2s;
 }
 
-
 .post-image:hover {
   transform: scale(1.02);
 }
@@ -203,4 +205,25 @@
   object-fit: cover;
   border-radius: 6px;
   cursor: pointer;
+}
+
+/* Header color classes for branch differentiation */
+.header-merah {
+  background-color: #ff4d4d !important; /* Red */
+}
+
+.header-hijau {
+  background-color: #4CAF50 !important; /* Green */
+}
+
+.header-ungu {
+  background-color: #800080 !important; /* Purple */
+}
+
+.header-biru {
+  background-color: #2196F3 !important; /* Blue */
+}
+
+.header-hitam {
+  background-color: #000000 !important; /* Black */
 }

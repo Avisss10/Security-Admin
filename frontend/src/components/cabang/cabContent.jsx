@@ -5,6 +5,8 @@ import CabHeader from './cabHeader';
 import EditCabangModal from './cabEdit';
 import DelConfirm from '../delConfirm';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CabContent = () => {
   const [cabangData, setCabangData] = useState([]);
@@ -25,8 +27,10 @@ const CabContent = () => {
       setCabangData(formatted);
     } catch (err) {
       console.error('Gagal fetch data cabang:', err);
+      toast.error('Gagal fetch data cabang');
     }
   };
+
 
   useEffect(() => {
     fetchCabangData();
@@ -40,8 +44,14 @@ const CabContent = () => {
         alamat_cabang: newCabang.alamat_cabang,
       });
       fetchCabangData(); // refresh list setelah tambah
+      toast.success('Cabang berhasil ditambahkan');
     } catch (err) {
       console.error('Gagal tambah cabang:', err);
+      if (err.response) {
+        toast.error('Gagal menambahkan cabang: ' + JSON.stringify(err.response.data));
+      } else {
+        toast.error('Gagal menambahkan cabang: ' + err.message);
+      }
     }
   };
 
@@ -54,8 +64,14 @@ const CabContent = () => {
       });
       fetchCabangData();
       handleCloseEditModal();
+      toast.success('Cabang berhasil diupdate');
     } catch (err) {
       console.error('Gagal update cabang:', err);
+      if (err.response) {
+        toast.error('Gagal mengupdate cabang: ' + JSON.stringify(err.response.data));
+      } else {
+        toast.error('Gagal mengupdate cabang: ' + err.message);
+      }
     }
   };
 
@@ -84,8 +100,14 @@ const CabContent = () => {
     try {
       await axios.delete(`http://localhost:5000/api/cabang/${cabangToDelete.id}`);
       fetchCabangData();
+      toast.success('Cabang berhasil dihapus');
     } catch (err) {
       console.error('Gagal menghapus cabang:', err);
+      if (err.response) {
+        toast.error('Gagal menghapus cabang: ' + JSON.stringify(err.response.data));
+      } else {
+        toast.error('Gagal menghapus cabang: ' + err.message);
+      }
     } finally {
       handleCloseDeleteModal();
     }

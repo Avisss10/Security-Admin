@@ -21,6 +21,22 @@ const Post = ({
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const menuRef = useRef(null);
 
+  // Function to get color class based on nama_cabang
+  const getColorClass = (namaCabang) => {
+    const merah = ['Witel', 'STO Tanjung Priok'];
+    const hijau = ['STO Mangga Besar', 'Pademangan', 'Mangga Dua'];
+    const ungu = ['STO Cilincing', 'STO Marunda', 'Gudang Marunda'];
+    const biru = ['STO Sunter', 'STO Kelapa Gading', 'Yanum Kelapa Gading'];
+    const hitam = ['STO Kota', 'STO Muara Karang'];
+
+    if (merah.some(name => namaCabang.includes(name))) return 'header-merah';
+    if (hijau.some(name => namaCabang.includes(name))) return 'header-hijau';
+    if (ungu.some(name => namaCabang.includes(name))) return 'header-ungu';
+    if (biru.some(name => namaCabang.includes(name))) return 'header-biru';
+    if (hitam.some(name => namaCabang.includes(name))) return 'header-hitam';
+    return '';
+  };
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -63,7 +79,7 @@ const Post = ({
 
   return (
     <div className='post'>
-      <div className="post-header">
+      <div className={`post-header ${getColorClass(nama_cabang)}`}>
         <div className="post-user">
           <img src={profileImage} alt="Profile" className="post-avatar" />
           <div className="post-user-info">

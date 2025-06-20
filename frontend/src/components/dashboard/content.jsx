@@ -1,8 +1,10 @@
- import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ContentHeader from './contentHeader';
 import Post from './post';
 import '../../styles/content.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Content = () => {
   const [laporanHariIni, setLaporanHariIni] = useState([]);
@@ -22,6 +24,7 @@ const Content = () => {
       setFilteredLaporan(res.data);
     } catch (err) {
       console.error('Gagal fetch laporan hari ini:', err);
+      toast.error('Gagal fetch laporan hari ini');
     }
   };
 
@@ -33,6 +36,7 @@ const Content = () => {
       setCabangOptions(cabangNames);
     } catch (err) {
       console.error('Gagal fetch cabang options:', err);
+      toast.error('Gagal fetch cabang options');
     }
   };
 
@@ -41,8 +45,10 @@ const Content = () => {
       await axios.delete(`http://localhost:5000/api/laporan/${id}`);
       setLaporanHariIni(prev => prev.filter(l => l.id_laporan !== id));
       setFilteredLaporan(prev => prev.filter(l => l.id_laporan !== id));
+      toast.success('Laporan berhasil dihapus');
     } catch (err) {
       console.error('Gagal hapus laporan:', err);
+      toast.error('Gagal hapus laporan');
     }
   };
 
@@ -106,6 +112,7 @@ const Content = () => {
           />
         ))
       )}
+      <ToastContainer position="top-center" />
     </div>
   );
 };
