@@ -7,7 +7,6 @@ import ArcHeader from './arcHeader';
 const Archive = () => {
   const [laporan, setLaporan] = useState([]);
   const [filtered, setFiltered] = useState([]);
-  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentFilter, setCurrentFilter] = useState({ dari: null, sampai: null, jenis: null, id_cabang: null });
 
@@ -16,7 +15,14 @@ const Archive = () => {
       setLoading(true);
       let params = {};
       if (filterParams) {
-        params = filterParams;
+        params = { ...filterParams };
+        const today = new Date().toISOString().split('T')[0];
+        if (!params.dari) {
+          params.dari = today;
+        }
+        if (!params.sampai) {
+          params.sampai = today;
+        }
       } else {
         const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
         params = { dari: today, sampai: today };
@@ -33,30 +39,10 @@ const Archive = () => {
   };
 
   const handleFilterSearch = (filter) => {
-    let filteredResult = laporan;
-
-    // Filter jenis
-    if (filter.jenis) {
-      filteredResult = filteredResult.filter(l => l.jenis_laporan === filter.jenis);
-    }
-
-    // Filter cabang
-    if (filter.id_cabang) {
-      filteredResult = filteredResult.filter(l => l.id_cabang == filter.id_cabang);
-    }
-
-    // Filter tanggal
-    if (filter.dari && filter.sampai) {
-      const dari = new Date(filter.dari);
-      const sampai = new Date(filter.sampai);
-      filteredResult = filteredResult.filter(l => {
-        const tanggal = new Date(l.tanggal_laporan);
-        return tanggal >= dari && tanggal <= sampai;
-      });
-    }
-
-    setFiltered(filteredResult);
-    setCurrentFilter(filter);
+    const defaultFilter = { dari: new Date().toISOString().split('T')[0], sampai: new Date().toISOString().split('T')[0], jenis: '', id_cabang: '' };
+    const appliedFilter = filter || defaultFilter;
+    fetchData(appliedFilter);
+    setCurrentFilter(appliedFilter);
   };
 
   const handleDelete = async (id) => {
@@ -64,21 +50,10 @@ const Archive = () => {
       await axios.delete(`http://localhost:5000/api/laporan/${id}`);
       const updated = laporan.filter(item => item.id_laporan !== id);
       setLaporan(updated);
-      setFiltered(updated.filter(item =>
-        item.judul_laporan.toLowerCase().includes(search.toLowerCase())
-      ));
+      setFiltered(updated);
     } catch (err) {
       console.error('Gagal hapus:', err);
     }
-  };
-
-  const handleSearchChange = (term) => {
-    setSearch(term);
-    setFiltered(
-      laporan.filter((item) =>
-        item.judul_laporan.toLowerCase().includes(term.toLowerCase())
-      )
-    );
   };
 
   useEffect(() => {
@@ -139,8 +114,7 @@ const Archive = () => {
     <div className="archive-wrapper">
       <ArcHeader/>
       <ArcSearch
-        search={search}
-        onSearchChange={handleSearchChange}
+        filter={currentFilter}
         onSearch={handleFilterSearch}
       />
       <div className="filter-description">
@@ -156,5 +130,6 @@ const Archive = () => {
     </div>
   );
 };
+
 
 export default Archive;

@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import '../../styles/search.css';
 import axios from 'axios';
 
-const ArchiveSearch = ({ onSearch }) => {
+const ArchiveSearch = ({ onSearch, filter: propFilter }) => {
   const [filter, setFilter] = useState({
     jenis: '',
     id_cabang: '',
     dari: '',
-    sampai: ''
+    sampai: '',
+    date_range: ''
   });
 
   const [cabangList, setCabangList] = useState([]);
@@ -25,6 +26,18 @@ const ArchiveSearch = ({ onSearch }) => {
       .then(res => setJenisList(res.data))
       .catch(err => console.error('Gagal ambil jenis laporan:', err));
   }, []);
+
+  useEffect(() => {
+    if (propFilter) {
+      setFilter({
+        jenis: propFilter.jenis || '',
+        id_cabang: propFilter.id_cabang || '',
+        dari: propFilter.dari || '',
+        sampai: propFilter.sampai || '',
+        date_range: ''
+      });
+    }
+  }, [propFilter]);
 
   const handleChange = (e) => {
     setFilter({ ...filter, [e.target.name]: e.target.value });
@@ -58,19 +71,14 @@ const ArchiveSearch = ({ onSearch }) => {
     setFilter({
       jenis: '',
       id_cabang: '',
+      dari: '',
+      sampai: '',
       date_range: ''
     });
-    onSearch({
-      jenis: '',
-      id_cabang: '',
-      dari: '',
-      sampai: ''
-    });
+    onSearch({});
   };
 
-
-
-return (
+  return (
     <div className='post'>
       <form className="search-row" onSubmit={handleSubmit}>
         <div className="input-group">
@@ -99,8 +107,8 @@ return (
           <label htmlFor="date_range">Rentang:</label>
           <select
             name="date_range"
-            value={filter.date_range || ''}
-            onChange={(e) => setFilter({ ...filter, date_range: e.target.value })}
+            value={filter.date_range}
+            onChange={handleChange}
           >
             <option value="">Pilih Rentang</option>
             <option value="today">Hari ini</option>
@@ -115,7 +123,6 @@ return (
         </div>
       </form>
 
-
       <div className="search-tips">
         <p>📊 Pilih rentang "Hari ini" untuk laporan terbaru atau "7 Hari Kebelakang" untuk laporan minggu ini.</p>
       </div>
@@ -124,3 +131,4 @@ return (
 };
 
 export default ArchiveSearch;
+
